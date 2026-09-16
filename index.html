@@ -1,0 +1,2411 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Random Value Recorder</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            color-scheme: dark;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Noto Sans Thai", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(14, 165, 233, 0.08), transparent 35%),
+                #020617;
+            color: #e2e8f0;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.94);
+            border: 1px solid #334155;
+            border-radius: 18px;
+        }
+
+        .input {
+            width: 100%;
+            border: 1px solid #334155;
+            background: #020617;
+            color: #f8fafc;
+            border-radius: 10px;
+            padding: 11px 12px;
+            outline: none;
+        }
+
+        .input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+        }
+
+        .input::placeholder {
+            color: #64748b;
+        }
+
+        .btn {
+            min-height: 42px;
+            padding: 0 15px;
+            border-radius: 10px;
+            font-weight: 700;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #1e293b;
+            border: 1px solid #475569;
+            color: #e2e8f0;
+        }
+
+        .btn-success {
+            background: #14532d;
+            border: 1px solid #16a34a;
+            color: #bbf7d0;
+        }
+
+        .btn-warning {
+            background: #713f12;
+            border: 1px solid #ca8a04;
+            color: #fef08a;
+        }
+
+        .btn-danger {
+            background: #4c0519;
+            border: 1px solid #9f1239;
+            color: #fecdd3;
+        }
+
+        .number-card {
+            width: 100%;
+            min-height: 52px;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 1.02rem;
+            font-weight: 800;
+            color: #e0f2fe;
+            background: #020617;
+            overflow-wrap: anywhere;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .number-card:hover {
+            border-color: #38bdf8;
+            background: #082f49;
+            transform: translateY(-1px);
+        }
+
+        .number-card.is-noted {
+            background: rgba(20, 83, 45, 0.65);
+            border-color: #22c55e;
+            color: #bbf7d0;
+        }
+
+        .number-card.is-noted:hover {
+            background: rgba(22, 101, 52, 0.8);
+            border-color: #4ade80;
+        }
+
+        .value-check {
+            color: #4ade80;
+            margin-right: 3px;
+        }
+
+        .record {
+            background: rgba(2, 6, 23, 0.62);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            transition: 0.15s ease;
+        }
+
+        .record:hover {
+            border-color: #475569;
+        }
+
+        .stat {
+            background: rgba(2, 6, 23, 0.65);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 4px 9px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-pending {
+            background: #1e293b;
+            color: #cbd5e1;
+        }
+
+        .badge-noted {
+            background: #14532d;
+            color: #bbf7d0;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 7px;
+            border-radius: 999px;
+            background: #1e293b;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #22c55e, #38bdf8);
+            transition: width 0.2s ease;
+        }
+
+        .checkbox {
+            width: 17px;
+            height: 17px;
+            accent-color: #0ea5e9;
+            cursor: pointer;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(2, 6, 23, 0.75);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 430px;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            background: #0f172a;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            z-index: 200;
+            transform: translateX(-50%);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            background: #0f172a;
+            color: white;
+            padding: 12px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            white-space: nowrap;
+            max-width: calc(100vw - 30px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+
+        <!-- HEADER -->
+        <header class="mb-6">
+            <div class="text-xs font-bold uppercase tracking-[0.2em] text-sky-400">
+                Random Value Recorder
+            </div>
+
+            <h1 class="mt-2 text-3xl font-extrabold text-white">
+                สุ่มค่า & จดบันทึก
+            </h1>
+
+            <p class="mt-2 text-sm text-slate-400">
+                สุ่มค่าตามช่วงและเงื่อนไขค่าเฉลี่ย พร้อมคลิกจดค่าที่ใช้ไปแล้วทีละตัว
+            </p>
+        </header>
+
+
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+
+            <!-- SETTINGS -->
+            <section class="glass h-fit p-5">
+
+                <h2 class="text-lg font-bold text-white">
+                    ตั้งค่าการสุ่ม
+                </h2>
+
+                <p class="mt-1 text-xs text-slate-500">
+                    กำหนดเงื่อนไขก่อนสร้างชุดข้อมูล
+                </p>
+
+
+                <div class="mt-5 space-y-4">
+
+                    <!-- TYPE -->
+                    <label class="block">
+                        <span class="mb-1.5 block text-sm font-semibold">
+                            ประเภทข้อมูล
+                        </span>
+
+                        <select id="typeInput" class="input">
+                            <option value="integer">จำนวนเต็ม (Integer)</option>
+                            <option value="decimal" selected>ทศนิยม (Decimal)</option>
+                        </select>
+                    </label>
+
+
+                    <!-- DECIMAL -->
+                    <label id="decimalGroup" class="block">
+                        <span class="mb-1.5 block text-sm font-semibold">
+                            จำนวนตำแหน่งทศนิยมของตัวเลข
+                        </span>
+
+                        <select id="decimalInput" class="input">
+                            <option value="0">0 ตำแหน่ง</option>
+                            <option value="1">1 ตำแหน่ง</option>
+                            <option value="2" selected>2 ตำแหน่ง</option>
+                            <option value="3">3 ตำแหน่ง</option>
+                            <option value="4">4 ตำแหน่ง</option>
+                            <option value="5">5 ตำแหน่ง</option>
+                            <option value="6">6 ตำแหน่ง</option>
+                        </select>
+                    </label>
+
+
+                    <!-- MIN MAX -->
+                    <div class="grid grid-cols-2 gap-3">
+
+                        <label>
+                            <span class="mb-1.5 block text-sm font-semibold">
+                                ค่าต่ำสุด
+                            </span>
+
+                            <input id="minInput" class="input" type="number" step="any" inputmode="decimal"
+                                value="14.80">
+                        </label>
+
+                        <label>
+                            <span class="mb-1.5 block text-sm font-semibold">
+                                ค่าสูงสุด
+                            </span>
+
+                            <input id="maxInput" class="input" type="number" step="any" inputmode="decimal"
+                                value="15.30">
+                        </label>
+
+                    </div>
+
+
+                    <!-- COUNT -->
+                    <label class="block">
+                        <span class="mb-1.5 block text-sm font-semibold">
+                            จำนวนตัวเลขต่อชุด
+                        </span>
+
+                        <input id="countInput" class="input" type="number" min="1" max="100" value="10">
+                    </label>
+
+
+                    <!-- AVERAGE SETTINGS -->
+                    <div class="rounded-xl border border-sky-900/60 bg-sky-950/20 p-3">
+
+                        <div class="mb-3">
+                            <div class="text-sm font-bold text-sky-300">
+                                เงื่อนไขค่าเฉลี่ย
+                            </div>
+
+                            <div class="mt-1 text-xs text-slate-500">
+                                ค่าเฉลี่ยของแต่ละชุดต้องอยู่ในช่วงที่กำหนด
+                            </div>
+                        </div>
+
+
+                        <div class="grid grid-cols-2 gap-3">
+
+                            <label>
+                                <span class="mb-1.5 block text-xs font-semibold">
+                                    ค่าเฉลี่ยต่ำสุด
+                                </span>
+
+                                <input id="avgMinInput" class="input" type="number" step="any" inputmode="decimal"
+                                    value="14.99">
+                            </label>
+
+                            <label>
+                                <span class="mb-1.5 block text-xs font-semibold">
+                                    ค่าเฉลี่ยสูงสุด
+                                </span>
+
+                                <input id="avgMaxInput" class="input" type="number" step="any" inputmode="decimal"
+                                    value="15.01">
+                            </label>
+
+                        </div>
+
+
+                        <label class="mt-3 block">
+                            <span class="mb-1.5 block text-xs font-semibold">
+                                จำนวนตำแหน่งทศนิยมของค่าเฉลี่ย
+                            </span>
+
+                            <select id="avgDecimalInput" class="input">
+                                <option value="0">0 ตำแหน่ง</option>
+                                <option value="1">1 ตำแหน่ง</option>
+                                <option value="2" selected>2 ตำแหน่ง</option>
+                                <option value="3">3 ตำแหน่ง</option>
+                                <option value="4">4 ตำแหน่ง</option>
+                                <option value="5">5 ตำแหน่ง</option>
+                                <option value="6">6 ตำแหน่ง</option>
+                            </select>
+                        </label>
+
+                    </div>
+
+
+                    <!-- SET COUNT -->
+                    <label class="block">
+                        <span class="mb-1.5 block text-sm font-semibold">
+                            จำนวนชุดที่ต้องการสุ่ม
+                        </span>
+
+                        <input id="setsInput" class="input" type="number" min="1" max="500" value="10">
+                    </label>
+
+
+                    <!-- UNIQUE -->
+                    <label
+                        class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-700 bg-slate-950/50 p-3">
+                        <input id="uniqueInput" type="checkbox" class="checkbox">
+
+                        <span>
+                            <span class="block text-sm font-semibold">
+                                ไม่ให้ค่าซ้ำภายในชุด
+                            </span>
+
+                            <span class="block text-xs text-slate-500">
+                                ค่าภายในชุดเดียวกันจะไม่ซ้ำกัน
+                            </span>
+                        </span>
+                    </label>
+
+
+                    <!-- LABEL -->
+                    <label class="block">
+                        <span class="mb-1.5 block text-sm font-semibold">
+                            ชื่อชุดข้อมูล
+                        </span>
+
+                        <input id="labelInput" class="input" type="text" maxlength="80"
+                            placeholder="เช่น ชุดทดลองครั้งที่ 1">
+                    </label>
+
+
+                    <!-- ERROR -->
+                    <div id="errorBox"
+                        class="hidden rounded-xl border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-300"></div>
+
+
+                    <button id="generateBtn" class="btn btn-primary w-full">
+                        สร้างชุดค่า
+                    </button>
+
+                    <button id="clearBtn" class="btn btn-secondary w-full">
+                        ล้างผลลัพธ์ปัจจุบัน
+                    </button>
+
+                </div>
+            </section>
+
+
+            <!-- MAIN -->
+            <section class="space-y-6">
+
+                <!-- SUMMARY -->
+                <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+
+                    <div class="stat">
+                        <div class="text-xs text-slate-500">จำนวนชุดทั้งหมด</div>
+                        <div id="totalSets" class="mt-1 text-2xl font-extrabold text-white">0</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="text-xs text-slate-500">ค่าที่จดแล้ว</div>
+                        <div id="notedValues" class="mt-1 text-2xl font-extrabold text-green-400">0</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="text-xs text-slate-500">ค่ายังไม่ได้จด</div>
+                        <div id="pendingValues" class="mt-1 text-2xl font-extrabold text-yellow-300">0</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="text-xs text-slate-500">จำนวนค่าทั้งหมด</div>
+                        <div id="totalNumbers" class="mt-1 text-2xl font-extrabold text-sky-300">0</div>
+                    </div>
+
+                </div>
+
+
+                <!-- CURRENT RESULTS -->
+                <div class="glass p-5">
+
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                        <div>
+                            <h2 class="text-lg font-bold text-white">
+                                ผลลัพธ์การสุ่มล่าสุด
+                            </h2>
+
+                            <p id="currentInfo" class="mt-1 text-xs text-slate-500">
+                                ยังไม่มีชุดข้อมูล
+                            </p>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2">
+
+                            <button id="copyCurrentBtn" class="btn btn-secondary text-sm">
+                                คัดลอกทั้งหมด
+                            </button>
+
+                            <button id="saveCurrentBtn" class="btn btn-primary text-sm">
+                                บันทึกทั้งหมด
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div id="currentEmpty"
+                        class="mt-5 rounded-xl border border-dashed border-slate-700 p-10 text-center text-slate-500">
+                        กด “สร้างชุดค่า” เพื่อเริ่มต้น
+                    </div>
+
+
+                    <div id="currentList" class="mt-5 space-y-4"></div>
+
+                </div>
+
+
+                <!-- SAVED RECORDS -->
+                <div class="glass p-5">
+
+                    <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+
+                        <div>
+                            <h2 class="text-lg font-bold text-white">
+                                ชุดข้อมูลที่บันทึก
+                            </h2>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                คลิกค่าทีละตัวเพื่อเปลี่ยนสถานะว่าจดแล้ว
+                            </p>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2">
+
+                            <button id="exportCsvBtn" class="btn btn-secondary text-sm">
+                                Export CSV
+                            </button>
+
+                            <button id="backupBtn" class="btn btn-secondary text-sm">
+                                สำรองข้อมูล
+                            </button>
+
+                            <button id="restoreBtn" class="btn btn-secondary text-sm">
+                                นำเข้าข้อมูล
+                            </button>
+
+                            <button id="clearAllBtn" class="btn btn-danger text-sm">
+                                ลบทั้งหมด
+                            </button>
+
+                            <input id="restoreFileInput" type="file" accept=".json,application/json" class="hidden">
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- FILTER -->
+                    <div class="mt-5 grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_180px_190px]">
+
+                        <input id="searchInput" class="input" type="search" placeholder="ค้นหาชื่อชุด หรือค่าตัวเลข...">
+
+                        <select id="statusFilter" class="input">
+                            <option value="all">ทุกสถานะ</option>
+                            <option value="pending">ยังไม่ได้จด</option>
+                            <option value="noted">จดครบทุกค่า</option>
+                        </select>
+
+                        <select id="sortInput" class="input">
+                            <option value="newest">ใหม่ล่าสุด</option>
+                            <option value="oldest">เก่าสุด</option>
+                            <option value="averageAsc">ค่าเฉลี่ยน้อยไปมาก</option>
+                            <option value="averageDesc">ค่าเฉลี่ยมากไปน้อย</option>
+                        </select>
+
+                    </div>
+
+
+                    <div id="savedList" class="mt-5 space-y-4"></div>
+
+
+                    <div id="savedEmpty"
+                        class="hidden rounded-xl border border-dashed border-slate-700 p-10 text-center text-slate-500">
+                        ยังไม่มีข้อมูลที่บันทึก
+                    </div>
+
+                </div>
+
+            </section>
+        </div>
+
+    </main>
+
+
+    <!-- MODAL -->
+    <div id="confirmModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+
+        <div class="modal p-5">
+
+            <h2 id="modalTitle" class="text-lg font-bold text-white">
+                ยืนยันการทำรายการ
+            </h2>
+
+            <p id="modalMessage" class="mt-2 text-sm text-slate-400"></p>
+
+            <div class="mt-5 flex justify-end gap-2">
+                <button id="modalCancelBtn" class="btn btn-secondary">
+                    ยกเลิก
+                </button>
+
+                <button id="modalConfirmBtn" class="btn btn-danger">
+                    ยืนยัน
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- TOAST -->
+    <div id="toast" class="toast hidden"></div>
+
+
+    <script>
+        "use strict";
+
+        (() => {
+
+            const STORAGE_KEY = "random-value-recorder-v2";
+
+            const state = {
+                currentSets: [],
+                savedSets: []
+            };
+
+            let confirmCallback = null;
+
+
+            const $ = id => document.getElementById(id);
+
+
+            const els = {
+                typeInput: $("typeInput"),
+                decimalGroup: $("decimalGroup"),
+                decimalInput: $("decimalInput"),
+
+                minInput: $("minInput"),
+                maxInput: $("maxInput"),
+                countInput: $("countInput"),
+
+                avgMinInput: $("avgMinInput"),
+                avgMaxInput: $("avgMaxInput"),
+                avgDecimalInput: $("avgDecimalInput"),
+
+                setsInput: $("setsInput"),
+                uniqueInput: $("uniqueInput"),
+                labelInput: $("labelInput"),
+
+                errorBox: $("errorBox"),
+                generateBtn: $("generateBtn"),
+                clearBtn: $("clearBtn"),
+
+                totalSets: $("totalSets"),
+                notedValues: $("notedValues"),
+                pendingValues: $("pendingValues"),
+                totalNumbers: $("totalNumbers"),
+
+                currentEmpty: $("currentEmpty"),
+                currentList: $("currentList"),
+                currentInfo: $("currentInfo"),
+
+                copyCurrentBtn: $("copyCurrentBtn"),
+                saveCurrentBtn: $("saveCurrentBtn"),
+
+                savedList: $("savedList"),
+                savedEmpty: $("savedEmpty"),
+
+                searchInput: $("searchInput"),
+                statusFilter: $("statusFilter"),
+                sortInput: $("sortInput"),
+
+                exportCsvBtn: $("exportCsvBtn"),
+                backupBtn: $("backupBtn"),
+                restoreBtn: $("restoreBtn"),
+                restoreFileInput: $("restoreFileInput"),
+                clearAllBtn: $("clearAllBtn"),
+
+                confirmModal: $("confirmModal"),
+                modalTitle: $("modalTitle"),
+                modalMessage: $("modalMessage"),
+                modalCancelBtn: $("modalCancelBtn"),
+                modalConfirmBtn: $("modalConfirmBtn"),
+
+                toast: $("toast")
+            };
+
+
+            function createId() {
+
+                if (
+                    window.crypto &&
+                    typeof crypto.randomUUID === "function"
+                ) {
+                    return crypto.randomUUID();
+                }
+
+                return Date.now() + "-" + Math.random().toString(36).slice(2);
+            }
+
+
+            function secureRandom() {
+
+                if (
+                    window.crypto &&
+                    typeof crypto.getRandomValues === "function"
+                ) {
+                    const buffer = new Uint32Array(1);
+
+                    crypto.getRandomValues(buffer);
+
+                    return buffer[0] / 4294967296;
+                }
+
+                return Math.random();
+            }
+
+
+            function randomBetween(min, max) {
+                return min + secureRandom() * (max - min);
+            }
+
+
+            function randomInteger(min, max) {
+                return Math.floor(randomBetween(min, max + 1));
+            }
+
+
+            function roundValue(value, decimals) {
+
+                const factor = Math.pow(10, decimals);
+
+                return Math.round((value + Number.EPSILON) * factor) / factor;
+            }
+
+
+            function formatNumber(value, decimals = 10) {
+
+                return Number(value).toLocaleString("th-TH", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: decimals
+                });
+            }
+
+
+            function formatAverage(value, decimals) {
+
+                return Number(value).toLocaleString("th-TH", {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                });
+            }
+
+
+            function formatDate(value) {
+
+                try {
+                    return new Date(value).toLocaleString("th-TH", {
+                        dateStyle: "medium",
+                        timeStyle: "short"
+                    });
+                } catch {
+                    return "-";
+                }
+            }
+
+
+            function escapeHtml(value) {
+
+                return String(value)
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#039;");
+            }
+
+
+            function showToast(message) {
+
+                els.toast.textContent = message;
+                els.toast.classList.remove("hidden");
+
+                clearTimeout(showToast.timer);
+
+                showToast.timer = setTimeout(() => {
+                    els.toast.classList.add("hidden");
+                }, 2500);
+            }
+
+
+            function cloneData(data) {
+                return JSON.parse(JSON.stringify(data));
+            }
+
+
+            function getSettings() {
+
+                return {
+                    type: els.typeInput.value,
+
+                    decimals: Number(els.decimalInput.value),
+                    avgDecimals: Number(els.avgDecimalInput.value),
+
+                    min: Number(els.minInput.value),
+                    max: Number(els.maxInput.value),
+
+                    count: Number(els.countInput.value),
+
+                    avgMin: Number(els.avgMinInput.value),
+                    avgMax: Number(els.avgMaxInput.value),
+
+                    sets: Number(els.setsInput.value),
+
+                    unique: els.uniqueInput.checked,
+
+                    label: els.labelInput.value.trim()
+                };
+            }
+
+
+            function showValidationError(errors) {
+
+                if (errors.length > 0) {
+
+                    els.errorBox.textContent = errors.join(" ");
+
+                    els.errorBox.classList.remove("hidden");
+                    els.generateBtn.disabled = true;
+
+                    return false;
+                }
+
+                els.errorBox.textContent = "";
+                els.errorBox.classList.add("hidden");
+                els.generateBtn.disabled = false;
+
+                return true;
+            }
+
+
+            function validateSettings() {
+
+                const settings = getSettings();
+                const errors = [];
+
+                if (!Number.isFinite(settings.min)) {
+                    errors.push("ค่าต่ำสุดไม่ถูกต้อง");
+                }
+
+                if (!Number.isFinite(settings.max)) {
+                    errors.push("ค่าสูงสุดไม่ถูกต้อง");
+                }
+
+                if (settings.min >= settings.max) {
+                    errors.push("ค่าต่ำสุดต้องน้อยกว่าค่าสูงสุด");
+                }
+
+                if (
+                    !Number.isInteger(settings.count) ||
+                    settings.count < 1 ||
+                    settings.count > 100
+                ) {
+                    errors.push("จำนวนค่าต่อชุดต้องอยู่ระหว่าง 1–100");
+                }
+
+                if (
+                    !Number.isInteger(settings.sets) ||
+                    settings.sets < 1 ||
+                    settings.sets > 500
+                ) {
+                    errors.push("จำนวนชุดต้องอยู่ระหว่าง 1–500");
+                }
+
+                if (
+                    !Number.isFinite(settings.avgMin) ||
+                    !Number.isFinite(settings.avgMax)
+                ) {
+                    errors.push("ช่วงค่าเฉลี่ยไม่ถูกต้อง");
+                }
+
+                if (settings.avgMin > settings.avgMax) {
+                    errors.push("ค่าเฉลี่ยต่ำสุดต้องไม่มากกว่าค่าเฉลี่ยสูงสุด");
+                }
+
+                if (settings.avgMin < settings.min) {
+                    errors.push("ค่าเฉลี่ยต่ำสุดต้องไม่น้อยกว่าค่าต่ำสุด");
+                }
+
+                if (settings.avgMax > settings.max) {
+                    errors.push("ค่าเฉลี่ยสูงสุดต้องไม่มากกว่าค่าสูงสุด");
+                }
+
+                if (settings.type === "integer") {
+
+                    if (
+                        !Number.isInteger(settings.min) ||
+                        !Number.isInteger(settings.max)
+                    ) {
+                        errors.push("โหมดจำนวนเต็มต้องใช้ค่าต่ำสุดและค่าสูงสุดเป็นจำนวนเต็ม");
+                    }
+
+                    if (
+                        !Number.isInteger(settings.avgMin) ||
+                        !Number.isInteger(settings.avgMax)
+                    ) {
+                        errors.push("โหมดจำนวนเต็มควรกำหนดค่าเฉลี่ยเป็นจำนวนเต็ม");
+                    }
+
+                    const possible = settings.max - settings.min + 1;
+
+                    if (settings.unique && settings.count > possible) {
+                        errors.push("จำนวนค่าต่อชุดมากกว่าจำนวนค่าที่ไม่ซ้ำกันได้");
+                    }
+
+                } else {
+
+                    const factor = Math.pow(10, settings.decimals);
+
+                    const possible =
+                        Math.floor(settings.max * factor) -
+                        Math.ceil(settings.min * factor) + 1;
+
+                    if (settings.unique && settings.count > possible) {
+                        errors.push("ความละเอียดทศนิยมไม่เพียงพอสำหรับจำนวนค่าที่ไม่ซ้ำกัน");
+                    }
+                }
+
+                return showValidationError(errors);
+            }
+
+
+            function calculateStats(values) {
+
+                return {
+                    min: Math.min(...values),
+                    max: Math.max(...values),
+                    average: values.reduce((sum, value) => sum + value, 0) / values.length
+                };
+            }
+
+
+            function getCandidateValues(settings, low, high, used) {
+
+                const precision =
+                    settings.type === "integer" ? 0 : settings.decimals;
+
+                const factor = Math.pow(10, precision);
+
+                const start = Math.ceil(low * factor);
+                const end = Math.floor(high * factor);
+
+                const candidates = [];
+
+                for (let index = start; index <= end; index++) {
+
+                    const candidate = roundValue(index / factor, precision);
+                    const key = String(candidate);
+
+                    if (!used.has(key)) {
+                        candidates.push(candidate);
+                    }
+                }
+
+                return candidates;
+            }
+
+
+            function generateOneSet(settings) {
+
+                const values = [];
+                const used = new Set();
+
+                const targetAverage = randomBetween(
+                    settings.avgMin,
+                    settings.avgMax
+                );
+
+                const targetSum = targetAverage * settings.count;
+
+                let remainingSum = targetSum;
+                let remainingCount = settings.count;
+
+                let attempts = 0;
+                const maxAttempts = 3000;
+
+
+                while (remainingCount > 0 && attempts < maxAttempts) {
+
+                    attempts++;
+
+                    const slotsLeft = remainingCount - 1;
+
+                    const minRemaining = slotsLeft * settings.min;
+                    const maxRemaining = slotsLeft * settings.max;
+
+                    const low = Math.max(
+                        settings.min,
+                        remainingSum - maxRemaining
+                    );
+
+                    const high = Math.min(
+                        settings.max,
+                        remainingSum - minRemaining
+                    );
+
+                    if (low > high) {
+                        break;
+                    }
+
+
+                    let value = null;
+
+
+                    if (settings.unique) {
+
+                        const candidates = getCandidateValues(
+                            settings,
+                            low,
+                            high,
+                            used
+                        );
+
+                        if (candidates.length > 0) {
+                            value = candidates[
+                                Math.floor(secureRandom() * candidates.length)
+                            ];
+                        }
+
+                    } else {
+
+                        if (settings.type === "integer") {
+
+                            const integerLow = Math.ceil(low);
+                            const integerHigh = Math.floor(high);
+
+                            if (integerLow <= integerHigh) {
+                                value = randomInteger(integerLow, integerHigh);
+                            }
+
+                        } else {
+
+                            value = randomBetween(low, high);
+
+                            value = roundValue(
+                                value,
+                                settings.decimals
+                            );
+
+                            if (value < settings.min) {
+                                value = settings.min;
+                            }
+
+                            if (value > settings.max) {
+                                value = settings.max;
+                            }
+                        }
+                    }
+
+
+                    if (value === null || !Number.isFinite(value)) {
+                        break;
+                    }
+
+
+                    const key = String(value);
+
+                    if (settings.unique && used.has(key)) {
+                        continue;
+                    }
+
+
+                    values.push(value);
+                    used.add(key);
+
+                    remainingSum -= value;
+                    remainingCount--;
+                }
+
+
+                if (values.length !== settings.count) {
+                    return null;
+                }
+
+
+                const stats = calculateStats(values);
+
+                const displayedAverage = roundValue(
+                    stats.average,
+                    settings.avgDecimals
+                );
+
+
+                if (
+                    displayedAverage < settings.avgMin ||
+                    displayedAverage > settings.avgMax
+                ) {
+                    return null;
+                }
+
+
+                return {
+                    id: createId(),
+
+                    values,
+
+                    notedValues: values.map(() => false),
+
+                    average: displayedAverage,
+                    avgDecimals: settings.avgDecimals,
+
+                    min: stats.min,
+                    max: stats.max,
+
+                    noted: false,
+
+                    createdAt: new Date().toISOString()
+                };
+            }
+
+
+            function generateSets() {
+
+                if (!validateSettings()) {
+                    showToast("กรุณาตรวจสอบการตั้งค่า");
+                    return;
+                }
+
+                const settings = getSettings();
+                const generated = [];
+
+
+                for (let i = 0; i < settings.sets; i++) {
+
+                    let result = null;
+                    let attempts = 0;
+
+                    while (!result && attempts < 150) {
+
+                        result = generateOneSet(settings);
+                        attempts++;
+                    }
+
+
+                    if (!result) {
+
+                        showToast(
+                            `สร้างชุดที่ ${i + 1} ไม่สำเร็จ กรุณาขยายช่วงตัวเลขหรือช่วงค่าเฉลี่ย`
+                        );
+
+                        break;
+                    }
+
+
+                    generated.push({
+                        ...result,
+
+                        label: settings.label || `ชุดที่ ${i + 1}`,
+
+                        type: settings.type,
+                        decimals: settings.decimals,
+
+                        minLimit: settings.min,
+                        maxLimit: settings.max,
+
+                        avgMin: settings.avgMin,
+                        avgMax: settings.avgMax,
+                        avgDecimals: settings.avgDecimals,
+
+                        unique: settings.unique
+                    });
+                }
+
+
+                state.currentSets = generated;
+
+                renderCurrentSets();
+
+                showToast(`สร้างสำเร็จ ${generated.length} ชุด`);
+            }
+
+
+            function getNotedCount(set) {
+
+                if (!Array.isArray(set.notedValues)) {
+                    return 0;
+                }
+
+                return set.notedValues.filter(Boolean).length;
+            }
+
+
+            function isSetFullyNoted(set) {
+
+                return set.values.length > 0 &&
+                    getNotedCount(set) === set.values.length;
+            }
+
+
+            function renderProgress(set) {
+
+                const total = set.values.length;
+                const noted = getNotedCount(set);
+                const percent = total === 0 ? 0 : (noted / total) * 100;
+
+                return `
+          <div class="mt-4">
+            <div class="mb-1 flex justify-between text-xs text-slate-500">
+              <span>ความคืบหน้าการจด</span>
+              <span>${noted}/${total}</span>
+            </div>
+
+            <div class="progress-track">
+              <div
+                class="progress-bar"
+                style="width: ${percent}%"
+              ></div>
+            </div>
+          </div>
+        `;
+            }
+
+
+            function renderValueButtons(set, source) {
+
+                return set.values.map((value, index) => {
+
+                    const noted = Boolean(set.notedValues?.[index]);
+
+                    return `
+            <button
+              type="button"
+              class="number-card ${noted ? "is-noted" : ""}"
+              data-value-action="toggle"
+              data-source="${source}"
+              data-set-id="${escapeHtml(set.id)}"
+              data-value-index="${index}"
+              title="${noted ? "คลิกเพื่อยกเลิกการจด" : "คลิกเพื่อทำเครื่องหมายว่าจดแล้ว"}"
+            >
+              <span class="value-check">${noted ? "✓ " : ""}</span>${escapeHtml(formatNumber(value, set.decimals))}
+            </button>
+          `;
+
+                }).join("");
+            }
+
+
+            function renderSetActions(set, source) {
+
+                const fullyNoted = isSetFullyNoted(set);
+
+                return `
+          <div class="flex flex-wrap gap-2">
+
+            <button
+              class="btn ${fullyNoted ? "btn-warning" : "btn-success"} text-xs"
+              data-set-action="toggleAll"
+              data-source="${source}"
+              data-set-id="${escapeHtml(set.id)}"
+            >
+              ${fullyNoted ? "ยกเลิกจดทั้งหมด" : "จดทั้งหมด"}
+            </button>
+
+            <button
+              class="btn btn-secondary text-xs"
+              data-set-action="copy"
+              data-source="${source}"
+              data-set-id="${escapeHtml(set.id)}"
+            >
+              คัดลอกชุดนี้
+            </button>
+
+            ${source === "saved" ? `
+              <button
+                class="btn btn-danger text-xs"
+                data-set-action="delete"
+                data-source="saved"
+                data-set-id="${escapeHtml(set.id)}"
+              >
+                ลบ
+              </button>
+            ` : ""}
+
+          </div>
+        `;
+            }
+
+
+            function renderSet(set, index, source) {
+
+                const fullyNoted = isSetFullyNoted(set);
+                const notedCount = getNotedCount(set);
+
+                return `
+          <article class="record p-4">
+
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+
+                  <h3 class="font-bold text-white">
+                    ${escapeHtml(set.label)}${source === "current" ? ` #${index + 1}` : ""}
+                  </h3>
+
+                  <span class="badge ${fullyNoted ? "badge-noted" : "badge-pending"}">
+                    ${fullyNoted ? "จดครบแล้ว" : `จดแล้ว ${notedCount}/${set.values.length}`}
+                  </span>
+
+                </div>
+
+                <p class="mt-1 text-xs text-slate-500">
+                  ${set.type === "integer"
+                        ? "จำนวนเต็ม"
+                        : `ทศนิยม ${set.decimals} ตำแหน่ง`
+                    }
+                  · จำนวน ${set.values.length} ค่า
+                  ${source === "saved" ? ` · ${escapeHtml(formatDate(set.createdAt))}` : ""}
+                </p>
+              </div>
+
+
+              ${renderSetActions(set, source)}
+
+            </div>
+
+
+            <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-5">
+              ${renderValueButtons(set, source)}
+            </div>
+
+
+            ${renderProgress(set)}
+
+
+            <div class="mt-4 grid grid-cols-3 gap-2">
+
+              <div class="rounded-lg bg-slate-900 p-3">
+                <div class="text-xs text-slate-500">ต่ำสุด</div>
+
+                <div class="mt-1 font-bold text-white">
+                  ${escapeHtml(formatNumber(set.min, set.decimals))}
+                </div>
+              </div>
+
+
+              <div class="rounded-lg bg-slate-900 p-3">
+                <div class="text-xs text-slate-500">สูงสุด</div>
+
+                <div class="mt-1 font-bold text-white">
+                  ${escapeHtml(formatNumber(set.max, set.decimals))}
+                </div>
+              </div>
+
+
+              <div class="rounded-lg bg-sky-950/40 p-3">
+                <div class="text-xs text-sky-400">ค่าเฉลี่ย</div>
+
+                <div class="mt-1 font-bold text-sky-300">
+                  ${escapeHtml(
+                        formatAverage(
+                            set.average,
+                            set.avgDecimals ?? 2
+                        )
+                    )}
+                </div>
+              </div>
+
+            </div>
+
+          </article>
+        `;
+            }
+
+
+            function renderCurrentSets() {
+
+                if (!state.currentSets.length) {
+
+                    els.currentEmpty.classList.remove("hidden");
+                    els.currentList.innerHTML = "";
+                    els.currentInfo.textContent = "ยังไม่มีชุดข้อมูล";
+
+                    return;
+                }
+
+
+                els.currentEmpty.classList.add("hidden");
+
+
+                const totalNumbers = state.currentSets.reduce(
+                    (sum, set) => sum + set.values.length,
+                    0
+                );
+
+
+                const notedNumbers = state.currentSets.reduce(
+                    (sum, set) => sum + getNotedCount(set),
+                    0
+                );
+
+
+                els.currentInfo.textContent =
+                    `สร้าง ${state.currentSets.length} ชุด · ${totalNumbers} ค่า · จดแล้ว ${notedNumbers} ค่า`;
+
+
+                els.currentList.innerHTML = state.currentSets
+                    .map((set, index) => renderSet(set, index, "current"))
+                    .join("");
+            }
+
+
+            function saveCurrentSets() {
+
+                if (!state.currentSets.length) {
+                    showToast("ยังไม่มีผลลัพธ์ให้บันทึก");
+                    return;
+                }
+
+
+                const now = new Date().toISOString();
+
+
+                const copied = state.currentSets.map(set => ({
+                    ...cloneData(set),
+
+                    id: createId(),
+                    createdAt: now
+                }));
+
+
+                state.savedSets.unshift(...copied);
+
+                saveData();
+
+                renderSavedSets();
+                renderSummary();
+
+                showToast(`บันทึก ${copied.length} ชุดแล้ว`);
+            }
+
+
+            function findSet(source, id) {
+
+                const list = source === "current"
+                    ? state.currentSets
+                    : state.savedSets;
+
+                return list.find(set => set.id === id);
+            }
+
+
+            function toggleValueNoted(source, setId, valueIndex) {
+
+                const set = findSet(source, setId);
+
+                if (!set) {
+                    return;
+                }
+
+                if (
+                    !Array.isArray(set.notedValues) ||
+                    set.notedValues.length !== set.values.length
+                ) {
+                    set.notedValues = set.values.map(() => false);
+                }
+
+
+                if (
+                    valueIndex < 0 ||
+                    valueIndex >= set.values.length
+                ) {
+                    return;
+                }
+
+
+                set.notedValues[valueIndex] =
+                    !set.notedValues[valueIndex];
+
+
+                set.noted =
+                    isSetFullyNoted(set);
+
+
+                if (source === "saved") {
+                    saveData();
+                    renderSavedSets();
+                } else {
+                    renderCurrentSets();
+                }
+
+
+                renderSummary();
+
+                showToast(
+                    set.notedValues[valueIndex]
+                        ? "ทำเครื่องหมายว่าจดแล้ว"
+                        : "ยกเลิกเครื่องหมายจดแล้ว"
+                );
+            }
+
+
+            function toggleAllValues(source, setId) {
+
+                const set = findSet(source, setId);
+
+                if (!set) {
+                    return;
+                }
+
+
+                const shouldUnmark = isSetFullyNoted(set);
+
+                set.notedValues =
+                    set.values.map(() => !shouldUnmark);
+
+                set.noted = !shouldUnmark;
+
+
+                if (source === "saved") {
+                    saveData();
+                    renderSavedSets();
+                } else {
+                    renderCurrentSets();
+                }
+
+
+                renderSummary();
+
+                showToast(
+                    shouldUnmark
+                        ? "ยกเลิกจดทั้งหมดแล้ว"
+                        : "จดค่าทั้งหมดแล้ว"
+                );
+            }
+
+
+            async function copyText(text) {
+
+                try {
+
+                    await navigator.clipboard.writeText(text);
+                    showToast("คัดลอกแล้ว");
+
+                } catch {
+
+                    const textarea = document.createElement("textarea");
+
+                    textarea.value = text;
+                    textarea.style.position = "fixed";
+                    textarea.style.opacity = "0";
+
+                    document.body.appendChild(textarea);
+
+                    textarea.select();
+
+                    try {
+                        document.execCommand("copy");
+                        showToast("คัดลอกแล้ว");
+                    } catch {
+                        showToast("ไม่สามารถคัดลอกได้");
+                    }
+
+                    textarea.remove();
+                }
+            }
+
+
+            function copySet(set) {
+
+                const text = [
+                    set.label,
+                    set.values.join(", "),
+                    `ค่าเฉลี่ย: ${formatAverage(set.average, set.avgDecimals ?? 2)}`
+                ].join("\n");
+
+                copyText(text);
+            }
+
+
+            function getFilteredSets() {
+
+                const query = els.searchInput.value.trim().toLowerCase();
+                const status = els.statusFilter.value;
+                const sort = els.sortInput.value;
+
+
+                let sets = state.savedSets.filter(set => {
+
+                    const searchText = [
+                        set.label,
+                        ...set.values.map(String),
+                        String(set.average)
+                    ]
+                        .join(" ")
+                        .toLowerCase();
+
+
+                    const matchesSearch =
+                        searchText.includes(query);
+
+
+                    const fullyNoted =
+                        isSetFullyNoted(set);
+
+
+                    const matchesStatus =
+                        status === "all" ||
+                        (status === "noted" && fullyNoted) ||
+                        (status === "pending" && !fullyNoted);
+
+
+                    return matchesSearch && matchesStatus;
+                });
+
+
+                sets.sort((a, b) => {
+
+                    if (sort === "newest") {
+                        return new Date(b.createdAt) - new Date(a.createdAt);
+                    }
+
+                    if (sort === "oldest") {
+                        return new Date(a.createdAt) - new Date(b.createdAt);
+                    }
+
+                    if (sort === "averageAsc") {
+                        return a.average - b.average;
+                    }
+
+                    if (sort === "averageDesc") {
+                        return b.average - a.average;
+                    }
+
+                    return 0;
+                });
+
+
+                return sets;
+            }
+
+
+            function renderSavedSets() {
+
+                const sets = getFilteredSets();
+
+
+                if (!sets.length) {
+
+                    els.savedList.innerHTML = "";
+                    els.savedEmpty.classList.remove("hidden");
+
+                    return;
+                }
+
+
+                els.savedEmpty.classList.add("hidden");
+
+
+                els.savedList.innerHTML = sets
+                    .map((set, index) => renderSet(set, index, "saved"))
+                    .join("");
+            }
+
+
+            function renderSummary() {
+
+                const totalSets = state.savedSets.length;
+
+                const totalNumbers = state.savedSets.reduce(
+                    (sum, set) => sum + set.values.length,
+                    0
+                );
+
+                const notedNumbers = state.savedSets.reduce(
+                    (sum, set) => sum + getNotedCount(set),
+                    0
+                );
+
+
+                els.totalSets.textContent =
+                    totalSets.toLocaleString("th-TH");
+
+                els.notedValues.textContent =
+                    notedNumbers.toLocaleString("th-TH");
+
+                els.pendingValues.textContent =
+                    (totalNumbers - notedNumbers).toLocaleString("th-TH");
+
+                els.totalNumbers.textContent =
+                    totalNumbers.toLocaleString("th-TH");
+            }
+
+
+            function handleSetAction(event) {
+
+                const button = event.target.closest("[data-set-action]");
+
+                if (!button) {
+                    return;
+                }
+
+
+                const action = button.dataset.setAction;
+                const source = button.dataset.source;
+                const id = button.dataset.setId;
+
+                const set = findSet(source, id);
+
+                if (!set) {
+                    return;
+                }
+
+
+                if (action === "toggleAll") {
+                    toggleAllValues(source, id);
+                }
+
+
+                if (action === "copy") {
+                    copySet(set);
+                }
+
+
+                if (action === "delete" && source === "saved") {
+
+                    openConfirm(
+                        "ลบชุดข้อมูล",
+                        `ต้องการลบ "${set.label}" หรือไม่?`,
+                        () => {
+
+                            const index = state.savedSets.findIndex(
+                                item => item.id === id
+                            );
+
+                            if (index !== -1) {
+                                state.savedSets.splice(index, 1);
+                            }
+
+                            saveData();
+                            renderSavedSets();
+                            renderSummary();
+
+                            showToast("ลบชุดข้อมูลแล้ว");
+                        }
+                    );
+                }
+            }
+
+
+            function handleValueAction(event) {
+
+                const button = event.target.closest("[data-value-action]");
+
+                if (!button) {
+                    return;
+                }
+
+
+                const source = button.dataset.source;
+                const setId = button.dataset.setId;
+                const valueIndex = Number(button.dataset.valueIndex);
+
+                toggleValueNoted(
+                    source,
+                    setId,
+                    valueIndex
+                );
+            }
+
+
+            function exportCsv() {
+
+                if (!state.savedSets.length) {
+                    showToast("ยังไม่มีข้อมูลให้ Export");
+                    return;
+                }
+
+
+                const header = [
+                    "id",
+                    "label",
+                    "type",
+                    "numberDecimals",
+                    "averageDecimals",
+                    "minLimit",
+                    "maxLimit",
+                    "averageMin",
+                    "averageMax",
+                    "values",
+                    "notedValues",
+                    "average",
+                    "min",
+                    "max",
+                    "createdAt"
+                ];
+
+
+                const rows = state.savedSets.map(set => [
+                    set.id,
+                    set.label,
+                    set.type,
+                    set.decimals,
+                    set.avgDecimals,
+                    set.minLimit,
+                    set.maxLimit,
+                    set.avgMin,
+                    set.avgMax,
+                    set.values.join(" "),
+                    set.values.map((value, index) =>
+                        set.notedValues?.[index] ? "จดแล้ว" : "ยังไม่ได้จด"
+                    ).join(" | "),
+                    set.average,
+                    set.min,
+                    set.max,
+                    set.createdAt
+                ]);
+
+
+                const escapeCsv = value => {
+                    return `"${String(value ?? "").replaceAll('"', '""')}"`;
+                };
+
+
+                const csv = [
+                    header,
+                    ...rows
+                ]
+                    .map(row => row.map(escapeCsv).join(","))
+                    .join("\r\n");
+
+
+                const blob = new Blob(
+                    ["\uFEFF" + csv],
+                    { type: "text/csv;charset=utf-8" }
+                );
+
+
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+
+                link.href = url;
+                link.download = "random-value-records.csv";
+
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+
+                setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                }, 1000);
+
+                showToast("Export CSV สำเร็จ");
+            }
+
+
+            function backupData() {
+
+                const data = {
+                    version: 2,
+                    exportedAt: new Date().toISOString(),
+                    savedSets: state.savedSets
+                };
+
+
+                const blob = new Blob(
+                    [JSON.stringify(data, null, 2)],
+                    { type: "application/json;charset=utf-8" }
+                );
+
+
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+
+                link.href = url;
+                link.download = "random-value-recorder-backup.json";
+
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+
+                setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                }, 1000);
+
+                showToast("สำรองข้อมูลสำเร็จ");
+            }
+
+
+            function restoreData(file) {
+
+                if (!file) {
+                    return;
+                }
+
+
+                if (file.size > 10 * 1024 * 1024) {
+                    showToast("ไฟล์ใหญ่เกินไป");
+                    return;
+                }
+
+
+                const reader = new FileReader();
+
+
+                reader.onload = () => {
+
+                    try {
+
+                        const data = JSON.parse(reader.result);
+
+
+                        if (
+                            !data ||
+                            !Array.isArray(data.savedSets)
+                        ) {
+                            throw new Error("Invalid data");
+                        }
+
+
+                        const imported = data.savedSets
+                            .filter(set =>
+                                set &&
+                                Array.isArray(set.values) &&
+                                set.values.length > 0
+                            )
+                            .map(set => normalizeSet(set));
+
+
+                        if (!imported.length) {
+                            showToast("ไม่พบข้อมูลที่สามารถนำเข้าได้");
+                            return;
+                        }
+
+
+                        openConfirm(
+                            "นำเข้าข้อมูล",
+                            `พบข้อมูล ${imported.length} ชุด ต้องการนำเข้าหรือไม่? ข้อมูลเดิมจะยังคงอยู่`,
+                            () => {
+
+                                state.savedSets.unshift(...imported);
+
+                                saveData();
+                                renderSavedSets();
+                                renderSummary();
+
+                                showToast(`นำเข้า ${imported.length} ชุดสำเร็จ`);
+                            }
+                        );
+
+                    } catch (error) {
+
+                        console.error(error);
+                        showToast("ไฟล์ข้อมูลไม่ถูกต้อง");
+                    }
+
+                };
+
+
+                reader.onerror = () => {
+                    showToast("ไม่สามารถอ่านไฟล์ได้");
+                };
+
+
+                reader.readAsText(file);
+            }
+
+
+            function openConfirm(title, message, callback) {
+
+                els.modalTitle.textContent = title;
+                els.modalMessage.textContent = message;
+
+                confirmCallback = callback;
+
+                els.confirmModal.classList.remove("hidden");
+
+                els.modalConfirmBtn.focus();
+            }
+
+
+            function closeConfirm() {
+
+                els.confirmModal.classList.add("hidden");
+                confirmCallback = null;
+            }
+
+
+            function clearAll() {
+
+                if (!state.savedSets.length) {
+                    showToast("ไม่มีข้อมูลให้ลบ");
+                    return;
+                }
+
+
+                openConfirm(
+                    "ลบข้อมูลทั้งหมด",
+                    `ต้องการลบข้อมูลทั้งหมด ${state.savedSets.length} ชุดหรือไม่?`,
+                    () => {
+
+                        state.savedSets = [];
+
+                        saveData();
+                        renderSavedSets();
+                        renderSummary();
+
+                        showToast("ลบข้อมูลทั้งหมดแล้ว");
+                    }
+                );
+            }
+
+
+            function saveData() {
+
+                try {
+
+                    localStorage.setItem(
+                        STORAGE_KEY,
+                        JSON.stringify({
+                            version: 2,
+                            savedSets: state.savedSets
+                        })
+                    );
+
+                } catch (error) {
+
+                    console.error(error);
+                    showToast("ไม่สามารถบันทึกข้อมูลใน Browser ได้");
+                }
+            }
+
+
+            function normalizeSet(set) {
+
+                const values = Array.isArray(set.values)
+                    ? set.values
+                        .map(Number)
+                        .filter(Number.isFinite)
+                    : [];
+
+
+                const notedValues =
+                    Array.isArray(set.notedValues)
+                        ? values.map((_, index) => Boolean(set.notedValues[index]))
+                        : values.map(() => false);
+
+
+                return {
+                    ...set,
+
+                    id: typeof set.id === "string"
+                        ? set.id
+                        : createId(),
+
+                    label: typeof set.label === "string"
+                        ? set.label
+                        : "ชุดข้อมูล",
+
+                    values,
+
+                    notedValues,
+
+                    noted: notedValues.every(Boolean),
+
+                    type: set.type === "integer"
+                        ? "integer"
+                        : "decimal",
+
+                    decimals: Number.isInteger(set.decimals)
+                        ? set.decimals
+                        : 2,
+
+                    avgDecimals: Number.isInteger(set.avgDecimals)
+                        ? set.avgDecimals
+                        : 2,
+
+                    average: Number.isFinite(Number(set.average))
+                        ? Number(set.average)
+                        : calculateStats(values).average,
+
+                    min: Number.isFinite(Number(set.min))
+                        ? Number(set.min)
+                        : Math.min(...values),
+
+                    max: Number.isFinite(Number(set.max))
+                        ? Number(set.max)
+                        : Math.max(...values),
+
+                    createdAt: set.createdAt || new Date().toISOString()
+                };
+            }
+
+
+            function loadData() {
+
+                try {
+
+                    const raw = localStorage.getItem(STORAGE_KEY);
+
+                    if (!raw) {
+                        return;
+                    }
+
+
+                    const data = JSON.parse(raw);
+
+
+                    if (
+                        !data ||
+                        !Array.isArray(data.savedSets)
+                    ) {
+                        return;
+                    }
+
+
+                    state.savedSets = data.savedSets
+                        .filter(set =>
+                            set &&
+                            Array.isArray(set.values) &&
+                            set.values.length > 0
+                        )
+                        .map(normalizeSet);
+
+                } catch (error) {
+
+                    console.error(error);
+                    showToast("ไม่สามารถอ่านข้อมูลเดิมได้");
+                }
+            }
+
+
+            function updateDecimalVisibility() {
+
+                const isDecimal = els.typeInput.value === "decimal";
+
+                els.decimalGroup.classList.toggle(
+                    "hidden",
+                    !isDecimal
+                );
+
+
+                if (!isDecimal) {
+                    els.decimalInput.value = "0";
+                }
+            }
+
+
+            function bindEvents() {
+
+                els.typeInput.addEventListener("change", () => {
+                    updateDecimalVisibility();
+                    validateSettings();
+                });
+
+
+                [
+                    els.minInput,
+                    els.maxInput,
+                    els.countInput,
+                    els.avgMinInput,
+                    els.avgMaxInput,
+                    els.avgDecimalInput,
+                    els.setsInput,
+                    els.decimalInput,
+                    els.uniqueInput
+                ].forEach(input => {
+
+                    input.addEventListener("input", validateSettings);
+                    input.addEventListener("change", validateSettings);
+
+                });
+
+
+                els.generateBtn.addEventListener(
+                    "click",
+                    generateSets
+                );
+
+
+                els.clearBtn.addEventListener("click", () => {
+
+                    state.currentSets = [];
+
+                    renderCurrentSets();
+
+                    showToast("ล้างผลลัพธ์ปัจจุบันแล้ว");
+                });
+
+
+                els.copyCurrentBtn.addEventListener("click", () => {
+
+                    if (!state.currentSets.length) {
+                        showToast("ยังไม่มีผลลัพธ์ให้คัดลอก");
+                        return;
+                    }
+
+
+                    const text = state.currentSets
+                        .map((set, index) => {
+
+                            return [
+                                `${set.label} #${index + 1}`,
+                                set.values.join(", "),
+                                `ค่าเฉลี่ย: ${formatAverage(set.average, set.avgDecimals ?? 2)}`
+                            ].join("\n");
+
+                        })
+                        .join("\n\n");
+
+
+                    copyText(text);
+                });
+
+
+                els.saveCurrentBtn.addEventListener(
+                    "click",
+                    saveCurrentSets
+                );
+
+
+                els.currentList.addEventListener(
+                    "click",
+                    handleValueAction
+                );
+
+
+                els.currentList.addEventListener(
+                    "click",
+                    handleSetAction
+                );
+
+
+                els.savedList.addEventListener(
+                    "click",
+                    handleValueAction
+                );
+
+
+                els.savedList.addEventListener(
+                    "click",
+                    handleSetAction
+                );
+
+
+                els.searchInput.addEventListener(
+                    "input",
+                    renderSavedSets
+                );
+
+
+                els.statusFilter.addEventListener(
+                    "change",
+                    renderSavedSets
+                );
+
+
+                els.sortInput.addEventListener(
+                    "change",
+                    renderSavedSets
+                );
+
+
+                els.exportCsvBtn.addEventListener(
+                    "click",
+                    exportCsv
+                );
+
+
+                els.backupBtn.addEventListener(
+                    "click",
+                    backupData
+                );
+
+
+                els.restoreBtn.addEventListener(
+                    "click",
+                    () => els.restoreFileInput.click()
+                );
+
+
+                els.restoreFileInput.addEventListener(
+                    "change",
+                    event => {
+
+                        const file = event.target.files?.[0];
+
+                        restoreData(file);
+
+                        event.target.value = "";
+                    }
+                );
+
+
+                els.clearAllBtn.addEventListener(
+                    "click",
+                    clearAll
+                );
+
+
+                els.modalCancelBtn.addEventListener(
+                    "click",
+                    closeConfirm
+                );
+
+
+                els.modalConfirmBtn.addEventListener(
+                    "click",
+                    () => {
+
+                        if (typeof confirmCallback === "function") {
+                            const callback = confirmCallback;
+
+                            closeConfirm();
+                            callback();
+                        }
+
+                    }
+                );
+
+
+                els.confirmModal.addEventListener(
+                    "click",
+                    event => {
+
+                        if (event.target === els.confirmModal) {
+                            closeConfirm();
+                        }
+
+                    }
+                );
+
+
+                document.addEventListener("keydown", event => {
+
+                    if (event.key === "Escape") {
+                        closeConfirm();
+                    }
+
+
+                    if (
+                        (event.ctrlKey || event.metaKey) &&
+                        event.key.toLowerCase() === "enter"
+                    ) {
+                        event.preventDefault();
+                        generateSets();
+                    }
+
+                });
+
+            }
+
+
+            function init() {
+
+                loadData();
+
+                updateDecimalVisibility();
+
+                bindEvents();
+
+                validateSettings();
+
+                renderCurrentSets();
+
+                renderSavedSets();
+
+                renderSummary();
+            }
+
+
+            init();
+
+        })();
+    </script>
+
+</body>
+
+</html>
