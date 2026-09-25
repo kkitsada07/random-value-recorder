@@ -539,15 +539,11 @@
 
 
                 <!-- SAVED RECORDS -->
-                <div class="glass p-5">
+                <div class="glass p-5 hidden">
 
                     <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
 
                         <div>
-                            <h2 class="text-lg font-bold text-white">
-                                ชุดข้อมูลที่บันทึก
-                            </h2>
-
                             <p class="mt-1 text-xs text-slate-500">
                                 คลิกค่าทีละตัวเพื่อเปลี่ยนสถานะว่าจดแล้ว
                             </p>
@@ -769,7 +765,7 @@
             function formatNumber(value, decimals = 10) {
 
                 return Number(value).toLocaleString("th-TH", {
-                    minimumFractionDigits: 0,
+                    minimumFractionDigits: decimals,
                     maximumFractionDigits: decimals
                 });
             }
@@ -831,7 +827,9 @@
                 return {
                     type: els.typeInput.value,
 
-                    decimals: Number(els.decimalInput.value),
+                    decimals: els.typeInput.value === "integer"
+                        ? 0
+                        : Number(els.decimalInput.value),
                     avgDecimals: Number(els.avgDecimalInput.value),
 
                     min: Number(els.minInput.value),
@@ -1008,7 +1006,11 @@
                     settings.avgMax
                 );
 
-                const targetSum = targetAverage * settings.count;
+                const precision = settings.type === "integer" ? 0 : settings.decimals;
+                const targetSum = roundValue(
+                    targetAverage * settings.count,
+                    precision
+                );
 
                 let remainingSum = targetSum;
                 let remainingCount = settings.count;
@@ -1160,6 +1162,7 @@
 
                 const settings = getSettings();
                 const generated = [];
+                let generationError = "";
 
 
                 for (let i = 0; i < settings.sets; i++) {
@@ -1176,9 +1179,8 @@
 
                     if (!result) {
 
-                        showToast(
-                            `สร้างชุดที่ ${i + 1} ไม่สำเร็จ กรุณาขยายช่วงตัวเลขหรือช่วงค่าเฉลี่ย`
-                        );
+                        generationError =
+                            `สร้างชุดที่ ${i + 1} ไม่สำเร็จ กรุณาขยายช่วงตัวเลขหรือช่วงค่าเฉลี่ย`;
 
                         break;
                     }
@@ -1208,7 +1210,9 @@
 
                 renderCurrentSets();
 
-                showToast(`สร้างสำเร็จ ${generated.length} ชุด`);
+                showToast(
+                    generationError || `สร้างสำเร็จ ${generated.length} ชุด`
+                );
             }
 
 
